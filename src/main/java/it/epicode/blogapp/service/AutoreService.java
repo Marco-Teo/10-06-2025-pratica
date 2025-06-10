@@ -15,6 +15,7 @@ public class AutoreService {
 
     public Autore saveAutore (Autore autore){
         autore.setId(new Random().nextInt(1,200));
+        autore.setAvatar("https://ui-avatars.com/api/?name="+autore.getNome()+"+"+autore.getCognome());
         autoriList.add(autore);
         return autore;
     }

@@ -18,6 +18,7 @@ public class BlogPostService {
 
     public BlogPost saveBlogPost (BlogPost blogPost){
         blogPost.setId(new Random().nextInt(1,200));
+        blogPost.setCover("https://picsum.photos/200/300");
         blogPostLista.add(blogPost);
         return blogPost;
     }
