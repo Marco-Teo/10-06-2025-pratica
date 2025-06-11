@@ -46,18 +46,23 @@ public class BlogPostService {
     }
 
 
-    public BlogPost updatePost(int id, BlogPost blogPost) throws BlogNotFoundExeption {
+    public BlogPost updatePost(int id, BlogPostDto blogPostDto) throws BlogNotFoundExeption, AutoreNotFoundExpetion {
         BlogPost blogPostToUpdate = getBlogPost(id);
 
-        blogPostToUpdate.setContenuto(blogPost.getContenuto());
+        blogPostToUpdate.setContenuto(blogPostDto.getContenuto());
 
-        blogPostToUpdate.setCategoria(blogPost.getCategoria());
+        blogPostToUpdate.setCategoria(blogPostDto.getCategoria());
 
-        blogPostToUpdate.setTitolo(blogPost.getTitolo());
+        blogPostToUpdate.setTitolo(blogPostDto.getTitolo());
 
-        blogPostToUpdate.setTempoDiLettura(blogPost.getTempoDiLettura());
+        blogPostToUpdate.setTempoDiLettura(blogPostDto.getTempoDiLettura());
 
-        return blogPostToUpdate;
+        if (blogPostToUpdate.getAutore().getId() != blogPostDto.getAutoreId()){
+            Autore autore = autoreService.getAutore(blogPostDto.getAutoreId());
+            blogPostToUpdate.setAutore(autore);
+        }
+
+        return blogRepository.save(blogPostToUpdate);
     }
 
     public void deletePost(int id) throws BlogNotFoundExeption {
