@@ -39,8 +39,8 @@ public class BlogPostController {
     }
 
     @PutMapping("/{id}")
-    public BlogPost updateBlogPost(@PathVariable int id,@RequestBody BlogPost blogPost) throws BlogNotFoundExeption {
-        return blogPostService.updatePost(id, blogPost);
+    public BlogPost updateBlogPost(@PathVariable int id,@RequestBody BlogPostDto blogPostDto) throws BlogNotFoundExeption, AutoreNotFoundExpetion {
+        return blogPostService.updatePost(id, blogPostDto);
     }
 
     @DeleteMapping("/{id}")
