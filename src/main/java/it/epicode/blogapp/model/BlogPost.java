@@ -1,10 +1,14 @@
 package it.epicode.blogapp.model;
 
+import jakarta.persistence.*;
 import lombok.Data;
 
 @Data
+@Entity
 public class BlogPost {
 
+    @Id
+    @GeneratedValue
     private int id;
 
     private String categoria;
@@ -16,4 +20,8 @@ public class BlogPost {
     private String contenuto;
 
     private int tempoDiLettura;
+
+    @ManyToOne
+    @JoinColumn(name = "autore_id")
+    private Autore autore;
 }

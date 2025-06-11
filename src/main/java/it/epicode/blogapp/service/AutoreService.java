@@ -1,53 +1,58 @@
 package it.epicode.blogapp.service;
 
+import it.epicode.blogapp.dto.AutoreDto;
 import it.epicode.blogapp.exeption.AutoreNotFoundExpetion;
 import it.epicode.blogapp.model.Autore;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import it.epicode.blogapp.repository.AutoreRepository;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Random;
+
 
 @Service
 public class AutoreService {
 
-    private List<Autore> autoriList = new ArrayList<>();
+    @Autowired
+    private AutoreRepository autoreRepository;
 
-    public Autore saveAutore (Autore autore){
-        autore.setId(new Random().nextInt(1,200));
+    public Autore saveAutore (AutoreDto autoreDto){
+        Autore autore = new Autore();
+        autore.setCognome(autoreDto.getCognome());
+        autore.setNome(autoreDto.getNome());
+        autore.setEmail(autoreDto.getEmail());
+        autore.setDataDiNascita(autoreDto.getDataDiNascita());
         autore.setAvatar("https://ui-avatars.com/api/?name="+autore.getNome()+"+"+autore.getCognome());
-        autoriList.add(autore);
+        autoreRepository.save(autore);
         return autore;
     }
 
     public Autore getAutore (int id) throws AutoreNotFoundExpetion {
-        return autoriList.stream().filter(autore -> autore.getId()==id).
-                findFirst().orElseThrow(() -> new AutoreNotFoundExpetion("Non esiste un autore con id  " + id));
+        return autoreRepository.findById(id).orElseThrow(() -> new AutoreNotFoundExpetion("Non esiste un autore con id  " + id));
     }
 
-    public List<Autore> getAllAutors(){
-        return autoriList;
+    public Page<Autore> getAllAutors(int page, int size, String sortBy){
+        Pageable pageable = PageRequest.of(page, size, Sort.by(sortBy));
+
+        return autoreRepository.findAll(pageable);
     }
 
     public Autore updateAutore(int id, Autore autore) throws AutoreNotFoundExpetion {
         Autore autoreToUpdate = getAutore(id);
-
         autoreToUpdate.setNome(autore.getNome());
-
         autoreToUpdate.setEmail(autore.getEmail());
-
         autoreToUpdate.setCognome(autore.getCognome());
-
         autoreToUpdate.setDataDiNascita(autore.getDataDiNascita());
-
+        autoreRepository.save(autoreToUpdate);
         return autoreToUpdate;
     }
 
     public void deleteAutore(int id) throws AutoreNotFoundExpetion {
-
         Autore deleteAutore = getAutore(id);
-
-        autoriList.remove(deleteAutore);
+        autoreRepository.delete(deleteAutore);
     }
 
 }

@@ -1,36 +1,50 @@
 package it.epicode.blogapp.service;
 
+import it.epicode.blogapp.dto.BlogPostDto;
+import it.epicode.blogapp.exeption.AutoreNotFoundExpetion;
 import it.epicode.blogapp.exeption.BlogNotFoundExeption;
 import it.epicode.blogapp.model.Autore;
 import it.epicode.blogapp.model.BlogPost;
+import it.epicode.blogapp.repository.BlogRepository;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
-
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Random;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 
 @Service
 public class BlogPostService {
 
-    private List<BlogPost> blogPostLista = new ArrayList<>();
+    @Autowired
+    private BlogRepository blogRepository;
 
+    @Autowired
+    private AutoreService autoreService;
 
+    public BlogPost saveBlogPost (BlogPostDto blogPostDto) throws AutoreNotFoundExpetion {
+        Autore autore = autoreService.getAutore(blogPostDto.getAutoreId());
 
-    public BlogPost saveBlogPost (BlogPost blogPost){
-        blogPost.setId(new Random().nextInt(1,200));
+        BlogPost blogPost = new BlogPost();
+        blogPost.setAutore(autore);
+        blogPost.setContenuto(blogPostDto.getContenuto());
+        blogPost.setTitolo(blogPostDto.getTitolo());
+        blogPost.setCategoria(blogPostDto.getCategoria());
+        blogPost.setTempoDiLettura(blogPostDto.getTempoDiLettura());
         blogPost.setCover("https://picsum.photos/200/300");
-        blogPostLista.add(blogPost);
+        blogRepository.save(blogPost);
         return blogPost;
     }
 
     public BlogPost getBlogPost(int id) throws BlogNotFoundExeption {
-        return blogPostLista.stream().filter(blogPost -> blogPost.getId()==id).
-                findFirst().orElseThrow(() -> new BlogNotFoundExeption("Non esiste un post con id " + id));
+        return blogRepository.findById(id).orElseThrow(() -> new BlogNotFoundExeption("Non esiste un post con id " + id));
     }
 
-    public List<BlogPost> getAllPosts(){
-        return blogPostLista;
+    public Page<BlogPost> getAllPosts(int page, int size, String sortBy) {
+        Pageable pageable = PageRequest.of(page, size, Sort.by(sortBy));
+        return blogRepository.findAll(pageable);
     }
+
 
     public BlogPost updatePost(int id, BlogPost blogPost) throws BlogNotFoundExeption {
         BlogPost blogPostToUpdate = getBlogPost(id);
@@ -48,7 +62,7 @@ public class BlogPostService {
 
     public void deletePost(int id) throws BlogNotFoundExeption {
         BlogPost deletedPost = getBlogPost(id);
-        blogPostLista.remove(deletedPost);
+        blogRepository.delete(deletedPost);
     }
 
 }
