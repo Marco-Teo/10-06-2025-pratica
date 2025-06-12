@@ -10,7 +10,9 @@ import org.springframework.data.domain.Page;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 
 
 @RestController
@@ -48,4 +50,8 @@ public class BlogPostController {
         blogPostService.deletePost(id);
     }
 
+    @PatchMapping("/{id}")
+    public String patchStudente(@PathVariable int id,@RequestBody MultipartFile file) throws BlogNotFoundExeption, IOException {
+       return blogPostService.patchPost(id,file);
+    }
 }

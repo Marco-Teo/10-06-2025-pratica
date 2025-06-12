@@ -1,5 +1,6 @@
 package it.epicode.blogapp.service;
 
+import com.cloudinary.Cloudinary;
 import it.epicode.blogapp.dto.BlogPostDto;
 import it.epicode.blogapp.exeption.AutoreNotFoundExpetion;
 import it.epicode.blogapp.exeption.BlogNotFoundExeption;
@@ -12,6 +13,10 @@ import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.web.multipart.MultipartFile;
+
+import java.io.IOException;
+import java.util.Collections;
 
 @Service
 public class BlogPostService {
@@ -22,6 +27,9 @@ public class BlogPostService {
     @Autowired
     private AutoreService autoreService;
 
+    @Autowired
+    private Cloudinary cloudinary;
+
     public BlogPost saveBlogPost (BlogPostDto blogPostDto) throws AutoreNotFoundExpetion {
         Autore autore = autoreService.getAutore(blogPostDto.getAutoreId());
 
@@ -31,9 +39,17 @@ public class BlogPostService {
         blogPost.setTitolo(blogPostDto.getTitolo());
         blogPost.setCategoria(blogPostDto.getCategoria());
         blogPost.setTempoDiLettura(blogPostDto.getTempoDiLettura());
-        blogPost.setCover("https://picsum.photos/200/300");
         blogRepository.save(blogPost);
         return blogPost;
+    }
+
+    public String patchPost (int id, MultipartFile file) throws BlogNotFoundExeption, IOException {
+        BlogPost postToPatch = getBlogPost(id);
+        String url = (String) cloudinary.uploader().upload(file.getBytes(), Collections.emptyMap()).get("url");
+        postToPatch.setCover(url);
+        blogRepository.save(postToPatch);
+
+        return url;
     }
 
     public BlogPost getBlogPost(int id) throws BlogNotFoundExeption {

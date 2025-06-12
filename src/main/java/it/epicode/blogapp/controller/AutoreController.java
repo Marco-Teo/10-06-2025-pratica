@@ -16,6 +16,8 @@ public class AutoreController {
     @Autowired
     private AutoreService autoreService;
 
+
+
     @GetMapping("")
     public Page<Autore> getAllAutori(@RequestParam(defaultValue = "0") int page,
                                          @RequestParam(defaultValue = "10") int size,
