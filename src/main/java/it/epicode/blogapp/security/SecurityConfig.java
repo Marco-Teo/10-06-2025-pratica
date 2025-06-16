@@ -35,6 +35,9 @@ public class SecurityConfig {
         // path
         httpSecurity.authorizeHttpRequests(http->http.requestMatchers(HttpMethod.GET).permitAll());
         httpSecurity.authorizeHttpRequests(http->http.requestMatchers(HttpMethod.POST).permitAll());
+        httpSecurity.authorizeHttpRequests(http->http.requestMatchers(HttpMethod.PATCH).permitAll());
+        httpSecurity.authorizeHttpRequests(http->http.requestMatchers(HttpMethod.PUT).permitAll());
+        httpSecurity.authorizeHttpRequests(http->http.requestMatchers(HttpMethod.DELETE).permitAll());
 
         // questo invce serve alla fine dopo aver permesso tutto quello che c'è sopra riportato questa riga serve a dire di negare tutte
         // le richieste che non sono elecate sopra
