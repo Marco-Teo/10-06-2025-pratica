@@ -9,6 +9,7 @@ import it.epicode.blogapp.service.AutoreService;
 import it.epicode.blogapp.service.UserService;
 import jakarta.validation.ValidationException;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -23,6 +24,9 @@ public class AuthController {
 
     @Autowired
     private AuthService authService;
+
+    @Autowired
+    private PasswordEncoder passwordEncoder;
 
     @PostMapping("/auth/register")
     public User register(@RequestBody @Validated UserDto userDto, BindingResult bindingResult)throws ValidationException{
@@ -44,5 +48,6 @@ public class AuthController {
         }
         return authService.login(logInDto);
     }
+    
 }
 

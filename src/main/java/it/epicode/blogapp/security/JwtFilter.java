@@ -1,11 +1,17 @@
 package it.epicode.blogapp.security;
 
+import it.epicode.blogapp.exeption.NotFoundException;
 import it.epicode.blogapp.exeption.UnAuthorizedExeption;
+import it.epicode.blogapp.model.User;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.autoconfigure.neo4j.Neo4jProperties;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 import org.springframework.util.AntPathMatcher;
 import org.springframework.web.filter.OncePerRequestFilter;
@@ -32,6 +38,18 @@ public class JwtFilter extends OncePerRequestFilter {
             String token = authorization.substring(7);
           // verifico che il token sia valido
             jwtTool.validateToken(token);
+
+            try {
+                User user = jwtTool.getUserFromToken(token);
+
+                Authentication authentication = new UsernamePasswordAuthenticationToken(user, null, user.getAuthorities());
+
+                SecurityContextHolder.getContext().setAuthentication(authentication);
+            }
+            catch (NotFoundException e){
+                throw new  UnAuthorizedExeption("Utente collegato al token non trovato");
+            }
+
             filterChain.doFilter(request,response);
         }
 

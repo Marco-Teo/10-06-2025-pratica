@@ -2,10 +2,12 @@ package it.epicode.blogapp.service;
 
 import it.epicode.blogapp.dto.UserDto;
 
+import it.epicode.blogapp.enumeration.Role;
 import it.epicode.blogapp.exeption.NotFoundException;
 import it.epicode.blogapp.model.User;
 import it.epicode.blogapp.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -16,12 +18,16 @@ public class UserService {
     @Autowired
     private UserRepository userRepository;
 
+    @Autowired
+    private PasswordEncoder passwordEncoder;
+
     public User saveUser(UserDto userDto){
         User user = new User();
         user.setNome(userDto.getNome());
         user.setCognome(userDto.getCognome());
         user.setUsername(userDto.getUsername());
-        user.setPassword(userDto.getPassword());
+        user.setPassword(passwordEncoder.encode(userDto.getPassword()));
+        user.setRole(Role.USER);
 
         return userRepository.save(user);
     }
@@ -42,8 +48,9 @@ public class UserService {
         userDaAggiornare.setNome(userDto.getNome());
         userDaAggiornare.setCognome(userDto.getCognome());
         userDaAggiornare.setUsername(userDto.getUsername());
-        userDaAggiornare.setPassword(userDto.getPassword());
-
+        if(!passwordEncoder.matches(userDto.getPassword(), userDaAggiornare.getPassword())) {
+            userDaAggiornare.setPassword(passwordEncoder.encode(userDto.getPassword()));
+        }
         return userRepository.save(userDaAggiornare);
     }
 

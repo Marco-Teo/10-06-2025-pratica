@@ -8,7 +8,9 @@ import jakarta.validation.ValidationException;
 import org.springframework.boot.context.properties.bind.BindResult;
 import org.springframework.data.domain.Page;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.BindingResult;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 
@@ -22,6 +24,7 @@ public class AutoreController {
 
 
     @GetMapping("")
+    @PreAuthorize("hasAnyAuthority('ADMIN','USER')")
     public Page<Autore> getAllAutori(@RequestParam(defaultValue = "0") int page,
                                          @RequestParam(defaultValue = "10") int size,
                                          @RequestParam(defaultValue = "id") String sortBy){
@@ -34,7 +37,8 @@ public class AutoreController {
     }
 
     @PostMapping("")
-    public Autore addAutore(@RequestBody AutoreDto autoreDto, BindingResult bindingResult){
+    @PreAuthorize("hasAuthority('ADMIN')")
+    public Autore addAutore(@RequestBody @Validated AutoreDto autoreDto, BindingResult bindingResult){
         if (bindingResult.hasErrors()){
             throw new ValidationException(bindingResult.getAllErrors().
                     stream().map(objectError -> objectError.getDefaultMessage()).
@@ -43,11 +47,14 @@ public class AutoreController {
        return autoreService.saveAutore(autoreDto);
     }
 
+    @PreAuthorize("hasAnyAuthority('ADMIN')")
     @PutMapping("/{id}")
     public Autore updateAutore(@PathVariable int id, @RequestBody Autore autore) throws AutoreNotFoundExpetion {
         return autoreService.updateAutore(id, autore);
     }
 
+
+    @PreAuthorize("hasAnyAuthority('ADMIN')")
     @DeleteMapping("/{id}")
     public void deleteAutore(@PathVariable int id) throws AutoreNotFoundExpetion {
         autoreService.deleteAutore(id);
